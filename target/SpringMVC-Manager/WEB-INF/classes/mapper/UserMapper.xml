@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lucy.manager.dao.UserMapper">
+  <!--用户返回Map-->
+  <resultMap id="BaseResultMap" type="com.lucy.manager.bean.User">
+    <id column="UserId" jdbcType="INTEGER" property="userid" />
+    <result column="Account" jdbcType="VARCHAR" property="account" />
+    <result column="UserName" jdbcType="VARCHAR" property="username" />
+    <result column="PassWord" jdbcType="VARCHAR" property="password" />
+    <result column="Token" jdbcType="VARCHAR" property="token" />
+    <result column="Level" jdbcType="INTEGER" property="level" />
+    <result column="UserInfoId" jdbcType="INTEGER" property="userinfoid" />
+    <result column="UserPointId" jdbcType="INTEGER" property="userpointid" />
+    <result column="InsertTime" jdbcType="TIMESTAMP" property="inserttime" />
+  </resultMap>
+  <!--用户与用户信息返回Map-->
+  <resultMap id="WithUserInfoResultMap" type="com.lucy.manager.bean.User">
+    <id column="UserId" jdbcType="INTEGER" property="userid" />
+    <result column="Account" jdbcType="VARCHAR" property="account" />
+    <result column="UserName" jdbcType="VARCHAR" property="username" />
+    <result column="PassWord" jdbcType="VARCHAR" property="password" />
+    <result column="Token" jdbcType="VARCHAR" property="token" />
+    <result column="Level" jdbcType="INTEGER" property="level" />
+    <result column="UserInfoId" jdbcType="INTEGER" property="userinfoid" />
+    <result column="UserPointId" jdbcType="INTEGER" property="userpointid" />
+    <result column="InsertTime" jdbcType="TIMESTAMP" property="inserttime" />
+    <!--指点联合查询用户信息封装-->
+    <association property="userInfo" javaType="com.lucy.manager.bean.UserInfo" >
+      <id column="UserInfoId" jdbcType="INTEGER" property="userinfoid" />
+      <result column="Phone" jdbcType="VARCHAR" property="phone" />
+      <result column="Country" jdbcType="VARCHAR" property="country" />
+      <result column="Province" jdbcType="VARCHAR" property="province" />
+      <result column="City" jdbcType="VARCHAR" property="city" />
+      <result column="Address" jdbcType="VARCHAR" property="address" />
+      <result column="RealName" jdbcType="VARCHAR" property="realname" />
+      <result column="BirthDay" jdbcType="TIMESTAMP" property="birthday" />
+      <result column="Gender" jdbcType="VARCHAR" property="gender" />
+      <result column="Avatar" jdbcType="VARCHAR" property="avatar" />
+      <result column="InsertTime" jdbcType="TIMESTAMP" property="inserttime" />
+    </association>
+  </resultMap>
+  <!--用户与用户积分返回Map-->
+  <resultMap id="WithUserPointResultMap" type="com.lucy.manager.bean.User">
+    <id column="UserId" jdbcType="INTEGER" property="userid" />
+    <result column="Account" jdbcType="VARCHAR" property="account" />
+    <result column="UserName" jdbcType="VARCHAR" property="username" />
+    <result column="PassWord" jdbcType="VARCHAR" property="password" />
+    <result column="Token" jdbcType="VARCHAR" property="token" />
+    <result column="Level" jdbcType="INTEGER" property="level" />
+    <result column="UserInfoId" jdbcType="INTEGER" property="userinfoid" />
+    <result column="UserPointId" jdbcType="INTEGER" property="userpointid" />
+    <result column="InsertTime" jdbcType="TIMESTAMP" property="inserttime" />
+    <!--指点联合查询用户信息封装-->
+    <association property="userPoint" javaType="com.lucy.manager.bean.UserInfo" >
+      <id column="UserPointId" jdbcType="INTEGER" property="userpointid" />
+      <result column="CIntegral" jdbcType="INTEGER" property="cintegral" />
+      <result column="TIntegral" jdbcType="INTEGER" property="tintegral" />
+      <result column="InsertTime" jdbcType="TIMESTAMP" property="inserttime" />
+    </association>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <!--用户-->
+  <sql id="Base_Column_List">
+    UserId, Account, UserName, PassWord, Token, Level, UserInfoId, UserPointId, InsertTime
+  </sql>
+  <!--用户与用户信息-->
+  <sql id="WithUserInfo_Column_List">
+    u.UserId, u.Account, u.UserName, u.PassWord, u.Token, u.Level, u.UserInfoId, u.UserPointId, u.InsertTime, ui.UserInfoId, ui.Phone, ui.Country, ui.Province, ui.City, ui.Address, ui.RealName, ui.BirthDay, ui.Gender, ui.Avatar, ui.InsertTime
+  </sql>
+  <!--用户与用户积分-->
+  <sql id="WithUserPoint_Column_List">
+    u.UserId, u.Account, u.UserName, u.PassWord, u.Token, u.Level, u.UserInfoId, u.UserPointId, u.InsertTime, up.UserPointId, up.CIntegral, up.TIntegral, up.InsertTime
+  </sql>
+  <!--普通查询用户-->
+  <select id="selectByExample" parameterType="com.lucy.manager.bean.UserExample" resultMap="BaseResultMap">
+  select
+  <if test="distinct">
+    distinct
+  </if>
+  <include refid="Base_Column_List" />
+  from user
+  <if test="_parameter != null">
+    <include refid="Example_Where_Clause" />
+  </if>
+  <if test="orderByClause != null">
+    order by ${orderByClause}
+  </if>
+</select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from user
+    where UserId = #{userid,jdbcType=INTEGER}
+  </select>
+  <!--联合查询用户与用户信息-->
+  <select id="selectByExampleWithUserInfo" parameterType="com.lucy.manager.bean.UserExample" resultMap="WithUserInfoResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="WithUserInfo_Column_List" />
+    from user u left join userinfo ui on u.UserInfoId = ui.UserInfoId
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKeyWithUserInfo" parameterType="java.lang.Integer" resultMap="WithUserInfoResultMap">
+    select
+    <include refid="WithUserInfo_Column_List" />
+    from user u left join userinfo ui on u.UserInfoId = ui.UserInfoId
+    where u.UserId = #{userid,jdbcType=INTEGER}
+  </select>
+  <!--联合查询用户与用户积分-->
+  <select id="selectByExampleWithUserPoint" parameterType="com.lucy.manager.bean.UserExample" resultMap="WithUserPointResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="WithUserPoint_Column_List" />
+    from user u left join userpoint up on u.UserInfoId = up.UserPointId
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKeyWithUserPoint" parameterType="java.lang.Integer" resultMap="WithUserPointResultMap">
+    select
+    <include refid="WithUserPoint_Column_List" />
+    from user u left join userpoint up on u.UserInfoId = up.UserPointId
+    where u.UserId = #{userid,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from user
+    where UserId = #{userid,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.lucy.manager.bean.UserExample">
+    delete from user
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.lucy.manager.bean.User">
+    insert into user (UserId, Account, UserName, 
+      PassWord, Token, Level, 
+      UserInfoId, UserPointId, InsertTime
+      )
+    values (#{userid,jdbcType=INTEGER}, #{account,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, 
+      #{password,jdbcType=VARCHAR}, #{token,jdbcType=VARCHAR}, #{level,jdbcType=INTEGER}, 
+      #{userinfoid,jdbcType=INTEGER}, #{userpointid,jdbcType=INTEGER}, #{inserttime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lucy.manager.bean.User">
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userid != null">
+        UserId,
+      </if>
+      <if test="account != null">
+        Account,
+      </if>
+      <if test="username != null">
+        UserName,
+      </if>
+      <if test="password != null">
+        PassWord,
+      </if>
+      <if test="token != null">
+        Token,
+      </if>
+      <if test="level != null">
+        Level,
+      </if>
+      <if test="userinfoid != null">
+        UserInfoId,
+      </if>
+      <if test="userpointid != null">
+        UserPointId,
+      </if>
+      <if test="inserttime != null">
+        InsertTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userid != null">
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="account != null">
+        #{account,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="token != null">
+        #{token,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null">
+        #{level,jdbcType=INTEGER},
+      </if>
+      <if test="userinfoid != null">
+        #{userinfoid,jdbcType=INTEGER},
+      </if>
+      <if test="userpointid != null">
+        #{userpointid,jdbcType=INTEGER},
+      </if>
+      <if test="inserttime != null">
+        #{inserttime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.lucy.manager.bean.UserExample" resultType="java.lang.Long">
+    select count(*) from user
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update user
+    <set>
+      <if test="record.userid != null">
+        UserId = #{record.userid,jdbcType=INTEGER},
+      </if>
+      <if test="record.account != null">
+        Account = #{record.account,jdbcType=VARCHAR},
+      </if>
+      <if test="record.username != null">
+        UserName = #{record.username,jdbcType=VARCHAR},
+      </if>
+      <if test="record.password != null">
+        PassWord = #{record.password,jdbcType=VARCHAR},
+      </if>
+      <if test="record.token != null">
+        Token = #{record.token,jdbcType=VARCHAR},
+      </if>
+      <if test="record.level != null">
+        Level = #{record.level,jdbcType=INTEGER},
+      </if>
+      <if test="record.userinfoid != null">
+        UserInfoId = #{record.userinfoid,jdbcType=INTEGER},
+      </if>
+      <if test="record.userpointid != null">
+        UserPointId = #{record.userpointid,jdbcType=INTEGER},
+      </if>
+      <if test="record.inserttime != null">
+        InsertTime = #{record.inserttime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update user
+    set UserId = #{record.userid,jdbcType=INTEGER},
+      Account = #{record.account,jdbcType=VARCHAR},
+      UserName = #{record.username,jdbcType=VARCHAR},
+      PassWord = #{record.password,jdbcType=VARCHAR},
+      Token = #{record.token,jdbcType=VARCHAR},
+      Level = #{record.level,jdbcType=INTEGER},
+      UserInfoId = #{record.userinfoid,jdbcType=INTEGER},
+      UserPointId = #{record.userpointid,jdbcType=INTEGER},
+      InsertTime = #{record.inserttime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lucy.manager.bean.User">
+    update user
+    <set>
+      <if test="account != null">
+        Account = #{account,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null">
+        UserName = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        PassWord = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="token != null">
+        Token = #{token,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null">
+        Level = #{level,jdbcType=INTEGER},
+      </if>
+      <if test="userinfoid != null">
+        UserInfoId = #{userinfoid,jdbcType=INTEGER},
+      </if>
+      <if test="userpointid != null">
+        UserPointId = #{userpointid,jdbcType=INTEGER},
+      </if>
+      <if test="inserttime != null">
+        InsertTime = #{inserttime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where UserId = #{userid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lucy.manager.bean.User">
+    update user
+    set Account = #{account,jdbcType=VARCHAR},
+      UserName = #{username,jdbcType=VARCHAR},
+      PassWord = #{password,jdbcType=VARCHAR},
+      Token = #{token,jdbcType=VARCHAR},
+      Level = #{level,jdbcType=INTEGER},
+      UserInfoId = #{userinfoid,jdbcType=INTEGER},
+      UserPointId = #{userpointid,jdbcType=INTEGER},
+      InsertTime = #{inserttime,jdbcType=TIMESTAMP}
+    where UserId = #{userid,jdbcType=INTEGER}
+  </update>
+</mapper>
