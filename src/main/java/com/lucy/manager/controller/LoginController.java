@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
 /**
@@ -29,7 +32,7 @@ public class LoginController {
     @RequestMapping(value = "/api/login", method = RequestMethod.GET)
     @ResponseBody
     @CrossOrigin
-    public Msg Login(@RequestParam String account,@RequestParam String password){
+    public Msg Login(HttpServletRequest request, HttpServletResponse response, @RequestParam String account, @RequestParam String password){
         User model = loginService.GetUser(account);
         if (model == null){
             return Msg.returnMsg(-1,"该账号还未注册！");
@@ -39,6 +42,15 @@ public class LoginController {
                 //生成UUID填写到Token与Cookie
                 String uuidstr = UUID.randomUUID().toString().substring(0,16);
                 loginService.UpdateToken(model.getUserid(), uuidstr);
+                Cookie[] cookies = request.getCookies();
+                for(Cookie cookie : cookies){
+                    if (cookie.getName().equals("User_Token")){
+                        cookie.setMaxAge(0);
+                    }
+                }
+                Cookie newCookie = new Cookie("User_Token",uuidstr);
+                newCookie.setMaxAge(24 * 60 * 60);
+                response.addCookie(newCookie);
                 return Msg.success().add("Token", uuidstr);
             }else {
                 //登录失败
@@ -51,14 +63,34 @@ public class LoginController {
      * 注册页面
      * @return
      */
-    @RequestMapping(value = "/api/regist", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/regist", method = RequestMethod.POST)
     @ResponseBody
     @CrossOrigin
-    public Msg Regist(@RequestParam String account,@RequestParam String password,@RequestParam String username){
+    public Msg Regist(HttpServletRequest request, HttpServletResponse response, @RequestParam String account,@RequestParam String password,@RequestParam String username){
         if (loginService.RegistUser(account, password, username)){
             return Msg.success();
         }else {
             return Msg.fail();
         }
+    }
+
+    /**
+     * Cookie检查
+     * @return
+     */
+    @RequestMapping(value = "/api/checkck",method = RequestMethod.GET)
+    @ResponseBody
+    @CrossOrigin
+    public Msg Check(HttpServletRequest request, HttpServletResponse response){
+        boolean error = true;
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies){
+            if (cookie.getName().equals("User_Token")){
+                error = false;
+                break;
+            }
+        }
+
+        return error == true ? Msg.fail() : Msg.success();
     }
 }
