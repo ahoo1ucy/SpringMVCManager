@@ -1,1 +1,1 @@
-# SpringMVCManager
+# Manager
